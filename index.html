@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>RefaMc Commission</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jersey+25&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="asset/logo.png">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --fg: #f0f0f0;
+      --mid: #1a1a1a;
+      --border: #2e2e2e;
+      --accent: #e8e8e8;
+      --dim: #555;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--fg);
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none; z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,0.18) 2px, rgba(0,0,0,0.18) 4px
+      );
+      pointer-events: none; z-index: 1;
+    }
+
+    .container {
+      position: relative; z-index: 2;
+      width: min(960px, 95vw);
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 48px;
+      font-size: 11px;
+      color: var(--dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+    }
+
+    .status-dot::before {
+      content: '';
+      width: 7px; height: 7px;
+      background: var(--fg);
+      animation: blink 1.4s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; } 50% { opacity: 0; }
+    }
+
+    .hero { margin-bottom: 60px; }
+
+    h1 {
+      font-family: 'Jersey 25', cursive;
+      font-size: clamp(52px, 9vw, 96px);
+      letter-spacing: 6px;
+      line-height: 1;
+    }
+
+    h1 .outline {
+      -webkit-text-stroke: 1px var(--fg);
+      color: transparent;
+      margin-left: 12px;
+    }
+
+    .subtitle-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .subtitle-row::before {
+      content: '';
+      width: 32px; height: 1px;
+      background: var(--dim);
+    }
+
+    .subtitle {
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--border);
+      animation: fadeUp 0.6s 0.15s ease both;
+    }
+
+    .card {
+      position: relative;
+      padding: 32px 24px 48px;
+      border-right: 1px solid var(--border);
+      cursor: pointer;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .card:last-child { border-right: none; }
+
+    .card[data-num]::before {
+      content: attr(data-num);
+      position: absolute;
+      top: 16px; right: 16px;
+      font-size: 10px; color: var(--dim);
+      letter-spacing: 2px;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--fg);
+      transform: scaleY(0);
+      transform-origin: bottom;
+      transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+      z-index: 0;
+    }
+
+    .card:hover::after { transform: scaleY(1); }
+    .card:hover .card-title,
+    .card:hover .card-tag { color: var(--bg); }
+
+    .card-inner { position: relative; z-index: 1; }
+
+    .card-tag {
+      font-size: 10px; letter-spacing: 3px;
+      color: var(--dim); text-transform: uppercase;
+      margin-bottom: 20px;
+      transition: color 0.2s;
+    }
+
+    .card-title {
+      font-family: 'Jersey 25', cursive;
+      font-size: 28px; letter-spacing: 2px;
+      line-height: 1.2;
+      transition: color 0.2s;
+    }
+
+    .card-arrow {
+      position: absolute;
+      bottom: 20px; right: 20px;
+      font-size: 18px; z-index: 1;
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity 0.2s, transform 0.2s, color 0.2s;
+    }
+
+    .card:hover .card-arrow {
+      opacity: 1;
+      transform: translateX(0);
+      color: var(--bg);
+    }
+
+    .card.disabled {
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    .soon-label {
+      position: absolute;
+      bottom: 18px; left: 24px;
+      font-size: 9px; letter-spacing: 3px;
+      color: var(--dim); text-transform: uppercase;
+      z-index: 1;
+    }
+
+    .bottom-bar {
+      margin-top: 32px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px; color: var(--dim); letter-spacing: 2px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .categories { grid-template-columns: 1fr; }
+      .card { border-right: none; border-bottom: 1px solid var(--border); }
+      .card:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="top-bar">
+      <span>REFAMC.COMMISSION</span>
+      <span class="status-dot">OPEN FOR WORK</span>
+    </div>
+
+    <div class="hero">
+      <h1>REFA<span class="outline">MC</span></h1>
+      <div class="subtitle-row">
+        <span class="subtitle">Minecraft Commission — Select Category</span>
+      </div>
+    </div>
+
+    <div class="categories">
+
+      <!-- 3D MODEL — linked -->
+      <a href="model.html" class="card" data-num="01">
+        <div class="card-inner">
+          <div class="card-tag">Service</div>
+          <div class="card-title">3D Model<br>Minecraft</div>
+        </div>
+        <span class="card-arrow">→</span>
+      </a>
+
+      <!-- THUMBNAIL — linked -->
+      <a href="thumbnail.html" class="card" data-num="02">
+        <div class="card-inner">
+          <div class="card-tag">Service</div>
+          <div class="card-title">Thumbnail<br>Minecraft</div>
+        </div>
+        <span class="card-arrow">→</span>
+      </a>
+
+      <!-- RPG SKILL — coming soon -->
+      <div class="card disabled" data-num="03">
+        <div class="card-inner">
+          <div class="card-tag">Service</div>
+          <div class="card-title">RPG Skill<br>Pack</div>
+        </div>
+        <span class="soon-label">COMING SOON</span>
+      </div>
+
+    </div>
+
+    <div class="bottom-bar">
+      <span>© REFAMC 2025</span>
+      <span>3 SERVICES</span>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thumbnail Gallery — RefaMc</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jersey+25&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --fg: #f0f0f0;
+      --mid: #1a1a1a;
+      --border: #2e2e2e;
+      --accent: #e8e8e8;
+      --dim: #555;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--fg);
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Scanlines */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.18) 2px,
+        rgba(0,0,0,0.18) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .page-wrapper {
+      position: relative;
+      z-index: 2;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px 60px;
+    }
+
+    /* Header */
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 0 28px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 56px;
+    }
+
+    .back-link {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--dim);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: var(--fg);
+    }
+
+    .back-link::before {
+      content: '←';
+      font-size: 14px;
+    }
+
+    .breadcrumb {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--dim);
+      text-transform: uppercase;
+    }
+
+    .breadcrumb span {
+      color: var(--fg);
+    }
+
+    /* Page title block */
+    .title-block {
+      margin-bottom: 48px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .title-label {
+      font-size: 10px;
+      letter-spacing: 4px;
+      color: var(--dim);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-family: 'Jersey 25', cursive;
+      font-size: clamp(40px, 6vw, 72px);
+      letter-spacing: 6px;
+      line-height: 1;
+    }
+
+    h1 .outline {
+      -webkit-text-stroke: 1px var(--fg);
+      color: transparent;
+    }
+
+    .count-badge {
+      display: inline-block;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--dim);
+      margin-top: 12px;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+    }
+
+    /* Gallery */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      animation: fadeUp 0.5s 0.1s ease both;
+    }
+
+    .item {
+      position: relative;
+      background: var(--bg);
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      cursor: pointer;
+    }
+
+    .item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: grayscale(20%);
+      transition: filter 0.3s, transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .item:hover img {
+      filter: grayscale(0%);
+      transform: scale(1.04);
+    }
+
+    /* Item overlay */
+    .item-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      display: flex;
+      align-items: flex-end;
+      padding: 20px;
+    }
+
+    .item:hover .item-overlay {
+      opacity: 1;
+    }
+
+    .item-num {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* Corner marker */
+    .item::before {
+      content: attr(data-index);
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.3);
+      z-index: 2;
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* Empty state */
+    .item-empty {
+      background: var(--mid);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 16/9;
+      color: var(--dim);
+      font-size: 11px;
+      letter-spacing: 2px;
+    }
+
+    /* Footer */
+    .page-footer {
+      margin-top: 32px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--dim);
+      letter-spacing: 2px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 640px) {
+      .page-wrapper { padding: 0 20px 40px; }
+      .gallery { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-wrapper">
+
+    <header class="site-header">
+      <a href="index.html" class="back-link">Back to Home</a>
+      <span class="breadcrumb">RefaMc / <span>Thumbnail</span></span>
+    </header>
+
+    <div class="title-block">
+      <div class="title-label">Portfolio</div>
+      <h1>THUMB<span class="outline">NAIL</span></h1>
+      <div class="count-badge">04 WORKS</div>
+    </div>
+
+    <div class="gallery">
+      <div class="item" data-index="01">
+        <img src="thumb/thumb1.png" alt="Thumbnail 1">
+        <div class="item-overlay"><span class="item-num">01 / THUMBNAIL</span></div>
+      </div>
+      <div class="item" data-index="02">
+        <img src="thumb/thumb2.png" alt="Thumbnail 2">
+        <div class="item-overlay"><span class="item-num">02 / THUMBNAIL</span></div>
+      </div>
+      <div class="item" data-index="03">
+        <img src="thumb/thumb3.png" alt="Thumbnail 3">
+        <div class="item-overlay"><span class="item-num">03 / THUMBNAIL</span></div>
+      </div>
+      <div class="item" data-index="04">
+        <img src="thumb/thumb4.png" alt="Thumbnail 4">
+        <div class="item-overlay"><span class="item-num">04 / THUMBNAIL</span></div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>© REFAMC 2025</span>
+      <span>THUMBNAIL — MINECRAFT</span>
+    </div>
+
+  </div>
+
+</body>
+</html>
