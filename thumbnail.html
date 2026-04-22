@@ -15,11 +15,7 @@
       --dim: #555;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       background-color: var(--bg);
@@ -29,7 +25,6 @@
       position: relative;
     }
 
-    /* Grid background */
     body::before {
       content: '';
       position: fixed;
@@ -42,7 +37,6 @@
       z-index: 0;
     }
 
-    /* Scanlines */
     body::after {
       content: '';
       position: fixed;
@@ -66,12 +60,11 @@
       padding: 0 40px 60px;
     }
 
-    /* Header */
     .site-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 28px 0 28px;
+      padding: 28px 0;
       border-bottom: 1px solid var(--border);
       margin-bottom: 56px;
     }
@@ -88,14 +81,8 @@
       transition: color 0.2s;
     }
 
-    .back-link:hover {
-      color: var(--fg);
-    }
-
-    .back-link::before {
-      content: '←';
-      font-size: 14px;
-    }
+    .back-link:hover { color: var(--fg); }
+    .back-link::before { content: '←'; font-size: 14px; }
 
     .breadcrumb {
       font-size: 10px;
@@ -104,11 +91,8 @@
       text-transform: uppercase;
     }
 
-    .breadcrumb span {
-      color: var(--fg);
-    }
+    .breadcrumb span { color: var(--fg); }
 
-    /* Page title block */
     .title-block {
       margin-bottom: 48px;
       animation: fadeUp 0.5s ease both;
@@ -144,7 +128,6 @@
       border: 1px solid var(--border);
     }
 
-    /* Gallery */
     .gallery {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -167,8 +150,8 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      filter: grayscale(20%);
-      transition: filter 0.3s, transform 0.4s cubic-bezier(0.4,0,0.2,1);
+      filter: grayscale(0%);
+      transition: filter 0.3s, transform 0.4s;
     }
 
     .item:hover img {
@@ -176,7 +159,6 @@
       transform: scale(1.04);
     }
 
-    /* Item overlay */
     .item-overlay {
       position: absolute;
       inset: 0;
@@ -188,9 +170,7 @@
       padding: 20px;
     }
 
-    .item:hover .item-overlay {
-      opacity: 1;
-    }
+    .item:hover .item-overlay { opacity: 1; }
 
     .item-num {
       font-size: 11px;
@@ -198,7 +178,6 @@
       color: rgba(255,255,255,0.6);
     }
 
-    /* Corner marker */
     .item::before {
       content: attr(data-index);
       position: absolute;
@@ -208,22 +187,8 @@
       letter-spacing: 2px;
       color: rgba(255,255,255,0.3);
       z-index: 2;
-      font-family: 'Space Mono', monospace;
     }
 
-    /* Empty state */
-    .item-empty {
-      background: var(--mid);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      aspect-ratio: 16/9;
-      color: var(--dim);
-      font-size: 11px;
-      letter-spacing: 2px;
-    }
-
-    /* Footer */
     .page-footer {
       margin-top: 32px;
       display: flex;
@@ -256,27 +221,10 @@
     <div class="title-block">
       <div class="title-label">Portfolio</div>
       <h1>THUMB<span class="outline">NAIL</span></h1>
-      <div class="count-badge">04 WORKS</div>
+      <div class="count-badge" id="count">00 WORKS</div>
     </div>
 
-    <div class="gallery">
-      <div class="item" data-index="01">
-        <img src="thumb/thumb1.png" alt="Thumbnail 1">
-        <div class="item-overlay"><span class="item-num">01 / THUMBNAIL</span></div>
-      </div>
-      <div class="item" data-index="02">
-        <img src="thumb/thumb2.png" alt="Thumbnail 2">
-        <div class="item-overlay"><span class="item-num">02 / THUMBNAIL</span></div>
-      </div>
-      <div class="item" data-index="03">
-        <img src="thumb/thumb3.png" alt="Thumbnail 3">
-        <div class="item-overlay"><span class="item-num">03 / THUMBNAIL</span></div>
-      </div>
-      <div class="item" data-index="04">
-        <img src="thumb/thumb4.png" alt="Thumbnail 4">
-        <div class="item-overlay"><span class="item-num">04 / THUMBNAIL</span></div>
-      </div>
-    </div>
+    <div class="gallery" id="gallery"></div>
 
     <div class="page-footer">
       <span>© REFAMC 2025</span>
@@ -284,6 +232,55 @@
     </div>
 
   </div>
+
+  <script>
+    // 🔥 AUTO LIST (pakai WEBP)
+  const images = [
+    "thumb1.webp",
+    "thumb2.webp",
+    "thumb3.webp",
+    "thumb4.webp",
+    "thumb5.webp",
+    "thumb6.webp",
+    "thumb7.webp",
+    "thumb8.webp",
+    "thumb9.webp",
+    "thumb10.webp",
+    "thumb11.webp",
+    "thumb12.webp",
+    "thumb13.webp",
+    "thumb14.webp",
+    "thumb15.webp",
+    "thumb16.webp",
+    "thumb17.webp",
+    "thumb18.webp",
+    "thumb19.webp",
+    "thumb20.webp"
+    ];
+
+    const gallery = document.getElementById("gallery");
+    const count = document.getElementById("count");
+
+    images.forEach((img, i) => {
+      const index = String(i + 1).padStart(2, '0');
+
+      const item = document.createElement("div");
+      item.className = "item";
+      item.setAttribute("data-index", index);
+
+      item.innerHTML = `
+        <img src="thumb/${img}" alt="Thumbnail ${index}">
+        <div class="item-overlay">
+          <span class="item-num">${index} / THUMBNAIL</span>
+        </div>
+      `;
+
+      gallery.appendChild(item);
+    });
+
+    // update jumlah
+    count.textContent = String(images.length).padStart(2, '0') + " WORKS";
+  </script>
 
 </body>
 </html>
