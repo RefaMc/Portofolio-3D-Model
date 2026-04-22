@@ -125,7 +125,7 @@
     .item img {
       width: 100%; height: 100%;
       object-fit: cover; display: block;
-      filter: grayscale(15%);
+      filter: grayscale(0%);
       transition: filter 0.3s, transform 0.4s cubic-bezier(0.4,0,0.2,1);
     }
 
@@ -261,7 +261,7 @@
     // Coba load model_v1 sampai model_v100, yang tidak ada otomatis disembunyikan
     const IMAGES = [];
     for (let i = 1; i <= 100; i++) {
-      IMAGES.push(`asset_model/porto_v${i}.png`);
+      IMAGES.push(`asset_model/porto_v${i}.webp`);
     }
 
     const gallery    = document.getElementById('gallery');
